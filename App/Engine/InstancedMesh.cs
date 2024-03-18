@@ -32,6 +32,10 @@ public class InstancedMesh : Mesh
             _vao.UpdateAttributeData(data, bufferlayout, _instanceAtributes[name]);
 
         }
+        public uint getInstancedAtribute(string name)
+        {
+            return getBuffer( _instanceAtributes[name]);
+        }
         
      
         public override void Draw(Matrix4 mvp , DrawInfo drawInfo, Matrix4 view,Matrix4 Projection)

@@ -2,5 +2,5 @@
 
 using App;
 
-Game game = new Game(800, 800, "App");
+Game game = new Game( 1920, 1080, "App");
 game.Run();

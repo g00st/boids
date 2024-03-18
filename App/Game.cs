@@ -25,9 +25,8 @@ public class Game : GameWindow
         View Main = new View();
         private int Width;
         private int Height;
-        private ColoredRectpParticles par;
-        private ColoredRectpParticles par2;
-        private ColoredRectpParticles par3;
+        private Swarm swarm;
+     
     
         private const int TargetFPS = 60; // Set your target FPS here
         private DateTime _lastFrameTime;
@@ -35,18 +34,17 @@ public class Game : GameWindow
    
 
         public Game(int width, int height, string title) : base(GameWindowSettings.Default,
-            new NativeWindowSettings() { ClientSize = (1920, 1080), Title = "hi", Profile = ContextProfile.Core })
+            new NativeWindowSettings() { ClientSize = (width, height), Title = "hi", Profile = ContextProfile.Core })
         {
             ErrorChecker.InitializeGLDebugCallback(); 
             _controller = new ImGuiController(ClientSize.X, ClientSize.Y);
             Width = width;
             Height = height;
-            par = new ColoredRectpParticles(new Vector2(1920/2, 1080/2), new Vector2(5,5), Color4.Green,100000,"par");
-            par2 = new ColoredRectpParticles(new Vector2(1920/2, 1080/2), new Vector2(5,5), Color4.Red,100000,"par");
-            par3 = new ColoredRectpParticles(new Vector2(1920/2, 1080/2), new Vector2(5,5), Color4.Blue,100000,"par");
-           Main.addObject(par);
-           Main.addObject(par2);
-           Main.addObject(par3);
+            swarm = new Swarm(100, new Vector2(width/2, height/2), new Vector2(10, 10));
+            Main.addObject(new ColoredRectangle(new Vector2(0),new Vector2(width,height), Color4.Red));
+            Main.addObject(swarm);
+            
+            
            this.Resize += e => Main.Resize(e.Width, e.Height);
             this.Resize += e => this.resize(e.Width, e.Height);
             this.KeyDown += e => Update(e);
@@ -69,7 +67,11 @@ public class Game : GameWindow
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
             base.OnUpdateFrame(args);
-          
+            
+           swarm.UpdateSwarm();
+            
+            
+            
             var elapsed = DateTime.Now - _lastFrameTime;
             var millisecondsPerFrame = 1000 / TargetFPS;
             if (elapsed.TotalMilliseconds < millisecondsPerFrame)
@@ -78,18 +80,8 @@ public class Game : GameWindow
                 System.Threading.Thread.Sleep(delay);
                 
             }
-            par.Update();
-            par2.Update();
-            par3.Update();
             _lastFrameTime = DateTime.Now;
-            if (MouseState.IsButtonDown(MouseButton.Right))
-            {
-               par.setwWind(new Vector2(MouseState.X, Height- MouseState.Y));
-               
-            }else
-            {
-                par.setwWind(par.drawInfo.Position);
-            }
+          
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -100,10 +92,8 @@ public class Game : GameWindow
             Main.draw();
             
               DrawInfo.darwImguiDebugWindow();
-              par.DrawImguiDebug();
-                par2.DrawImguiDebug();
-                par3.DrawImguiDebug();
-          //   ImGui.ShowIDStackToolWindow();
+               swarm.ImguiControls();
+              //   ImGui.ShowIDStackToolWindow();
               ImGuiController.CheckGLError("End of frame");
               
               _controller.Render();
