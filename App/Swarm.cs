@@ -54,10 +54,10 @@ public class Swarm: DrawObject
         Console.WriteLine("test "+ test);
         for (int i = 0; i < count; i++)
         {
-            positions[i*4] = i* 10 ;
-            positions[i*4+1]= (float) (i % test) * 10 ;
+            positions[i*4] = 0 ;
+            positions[i*4+1]= 0 ;
             positions[i*4+2] = MathF.PI*2/count * i;
-            Console.WriteLine("f "+ positions[i*3] + "  " + positions[i*3+1] + "  " + positions[i*3+2]);
+            //Console.WriteLine("f "+ positions[i*3] + "  " + positions[i*3+1] + "  " + positions[i*3+2]);
         }
 
         mesh.AddInstancedAtribute(posslayout, positions, "positions");
@@ -125,7 +125,7 @@ public class Swarm: DrawObject
         ImGui.SliderFloat("Cohesion Weight", ref cohesionWeight, 0.0f, 10.0f);
         ImGui.SliderFloat("Separation Weight", ref separationWeight, 0.0f, 10.0f);
         System.Numerics.Vector4 bounds = new System.Numerics.Vector4(Bounds.X, Bounds.Y, Bounds.Z, Bounds.W);
-        ImGui.SliderFloat4("Bounds", ref bounds, -1000.0f, 1000.0f);
+        ImGui.SliderFloat4("Bounds", ref bounds, 0f, 1000.0f);
         Bounds = new Vector4(bounds.X, bounds.Y, bounds.Z, bounds.W);
         
         

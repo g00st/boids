@@ -17,10 +17,10 @@ layout(std430, binding = 1) buffer InstanceVelocityBuffer {
         _computeShader.setUniformV2f( "u_Bounds", Bounds );
 */
 
-uniform float alignmentWeight;
-uniform float cohesionWeight;
-uniform float separationWeight;
-uniform vec4 Bounds;
+uniform float u_AlignmentWeight;
+uniform float u_CohesionWeight;
+uniform float u_SeparationWeight;
+uniform vec4 u_Bounds;
 
 
 
@@ -43,7 +43,7 @@ void main() {
     vec2 velocity = instanceVelocity[index];
 
 
-    float theta = 0.01; // Adjust this value to control the rotation speed
+    float theta =  randomVec2(position)*0.1; // Adjust this value to control the rotation speed
 
     // Calculate the rotation matrix
     mat2 rotationMatrix = mat2(cos(theta), -sin(theta), sin(theta), cos(theta));
@@ -56,13 +56,15 @@ void main() {
     position += velocity;
     // Update instance rotation
    
-/*
-    if(position.x < Bounds.x || position.x > Bounds.z){
+ 
+    if(position.x < -u_Bounds.x || position.x > u_Bounds.z){
         velocity.x = -velocity.x;
+        position.x = clamp(position.x, -u_Bounds.x, u_Bounds.z);
     }
-    if(position.y < Bounds.y || position.y > Bounds.w){
+    if(position.y < -u_Bounds.y || position.y > u_Bounds.w){
         velocity.y = -velocity.y;
-    }*/
+        position.y = clamp(position.y, -u_Bounds.y, u_Bounds.w);
+    }
     rotation = atan(velocity.x, velocity.y);
     
     instancePosition[index] = vec4(position, rotation,0);
