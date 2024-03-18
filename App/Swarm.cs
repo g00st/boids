@@ -13,6 +13,12 @@ public class Swarm: DrawObject
     public float alignmentWeight = 1.0f;
     public float cohesionWeight = 1.0f;
     public float separationWeight = 1.0f;
+    
+    public float separationDistance = 10.0f;
+    public float alingmentDistance = 10.0f;
+    public float cohesionDistance = 10.0f;
+    
+    public float maxVelocety  = 1.0f;
     public Vector4 Bounds;
     float[] positions;
     float offset = 0.0f;
@@ -21,7 +27,7 @@ public class Swarm: DrawObject
 
     public Swarm(int count, Vector2 positon, Vector2 size, string name = "Swarm")
     {
-        Bounds = new Vector4(-200, -200, 200, 200);
+        Bounds = new Vector4(200, 200, 200, 200);
         _count = count;
         InstancedMesh mesh = new InstancedMesh(count);
 
@@ -90,6 +96,12 @@ public class Swarm: DrawObject
         _computeShader.setUniform1v("u_SeparationWeight", separationWeight);
         _computeShader.setUniform4v("u_Bounds", Bounds.X, Bounds.Y, Bounds.Z, Bounds.W);
         
+        _computeShader.setUniform1v("u_MaxVel", maxVelocety);
+        _computeShader.setUniform1v("u_AlignmentRadius", alingmentDistance);
+        _computeShader.setUniform1v("u_CohesionRadius", cohesionDistance);
+        //_computeShader.setUniform1v("u_SeperationRadius", separationDistance);
+     
+        
     }
 
     public DrawInfo drawInfo { get; }
@@ -122,8 +134,17 @@ public class Swarm: DrawObject
     {
         ImGui.Begin("Swarm");
         ImGui.SliderFloat("Alignment Weight", ref alignmentWeight, 0.0f, 10.0f);
+        ImGui.SliderFloat("Alignment Distance", ref alingmentDistance, 0.0f, 100.0f);
+        
         ImGui.SliderFloat("Cohesion Weight", ref cohesionWeight, 0.0f, 10.0f);
+        ImGui.SliderFloat("Cohesion Distance", ref cohesionDistance, 0.0f, 100.0f);
+        
+        
         ImGui.SliderFloat("Separation Weight", ref separationWeight, 0.0f, 10.0f);
+        ImGui.SliderFloat("Separation Distance", ref separationDistance, 0.0f, 100.0f);
+        
+        ImGui.SliderFloat("Max Velocity", ref maxVelocety, 0.0f, 10.0f);
+        
         System.Numerics.Vector4 bounds = new System.Numerics.Vector4(Bounds.X, Bounds.Y, Bounds.Z, Bounds.W);
         ImGui.SliderFloat4("Bounds", ref bounds, 0f, 1000.0f);
         Bounds = new Vector4(bounds.X, bounds.Y, bounds.Z, bounds.W);
@@ -133,10 +154,13 @@ public class Swarm: DrawObject
             ImGui.End();
             
             //updat uniform if changed
-            
+            _computeShader.setUniform1v("u_MaxVel", maxVelocety);
             _computeShader.setUniform1v("u_AlignmentWeight", alignmentWeight);
             _computeShader.setUniform1v("u_CohesionWeight", cohesionWeight);
             _computeShader.setUniform1v("u_SeparationWeight", separationWeight);
+            _computeShader.setUniform1v("u_AlignmentRadius", alingmentDistance);
+            _computeShader.setUniform1v("u_CohesionRadius", cohesionDistance);
+            _computeShader.setUniform1v("u_SeperationRadius", separationDistance);
             _computeShader.setUniform4v("u_Bounds", Bounds.X, Bounds.Y, Bounds.Z, Bounds.W);
     }
 }

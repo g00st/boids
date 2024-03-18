@@ -34,7 +34,7 @@ public class Game : GameWindow
         _controller = new ImGuiController(ClientSize.X, ClientSize.Y);
         Width = width;
         Height = height;
-        swarm = new Swarm(1000, new Vector2(width / 2, height / 2), new Vector2(10, 10));
+        swarm = new Swarm(10000, new Vector2(width / 2, height / 2), new Vector2(10, 10));
         Main.addObject(new ColoredRectangle(new Vector2(0), new Vector2(width, height), Color4.DarkBlue));
         Main.addObject(swarm);
 
@@ -64,7 +64,7 @@ public class Game : GameWindow
         base.OnUpdateFrame(args);
 
         swarm.UpdateSwarm();
-
+        
 
         var elapsed = DateTime.Now - _lastFrameTime;
         var millisecondsPerFrame = 1000 / TargetFPS;

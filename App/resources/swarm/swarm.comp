@@ -20,7 +20,14 @@ layout(std430, binding = 1) buffer InstanceVelocityBuffer {
 uniform float u_AlignmentWeight;
 uniform float u_CohesionWeight;
 uniform float u_SeparationWeight;
+uniform float u_MaxVel;
+uniform float u_SeperationRadius;
+uniform float u_AlignmentRadius;
+uniform float u_CohesionRadius;
 uniform vec4 u_Bounds;
+uniform vec2 MousePos;
+uniform float MouseActive;
+uniform float MouseStrength;
 
 
 
@@ -43,7 +50,7 @@ void main() {
     vec2 velocity = instanceVelocity[index];
 
 
-    float theta =  randomVec2(position)*0.1; // Adjust this value to control the rotation speed
+    float theta =  randomVec2( vec2(position.x*position.y,index))*0.1; // Adjust this value to control the rotation speed
 
     // Calculate the rotation matrix
     mat2 rotationMatrix = mat2(cos(theta), -sin(theta), sin(theta), cos(theta));
@@ -51,6 +58,54 @@ void main() {
     // Apply the rotation matrix to the velocity vector
     velocity = rotationMatrix * velocity;
     //che bounds
+    int alginmentCount = 0;
+    int cohesionCount = 0;
+    int separationCount = 0;
+    
+    for (uint i = 0; i < gl_NumWorkGroups.x; i++) {
+        vec2 otherPosition = instancePosition[i].xy;
+        vec2 otherVelocity = instanceVelocity[i];
+        float distance = distance(position, otherPosition);
+        if (distance < u_SeperationRadius && i != index) {
+            vec2 toOther = otherPosition - position;
+            separation -= normalize( toOther) / distance;
+            separationCount++;
+        }
+        
+        if (distance < u_AlignmentRadius && i != index) {
+            alignment +=  otherVelocity;
+            alginmentCount++;
+        }
+        
+        if (distance < u_CohesionRadius && i != index) {
+            cohesion += otherPosition;
+            cohesionCount++;
+        }
+    }
+    
+    if(separationCount > 0){
+        separation /= float(separationCount);
+        separation*=u_SeparationWeight;
+    }
+    
+    if(alginmentCount > 0){
+        alignment /= float(alginmentCount);
+        alignment*=u_AlignmentWeight;
+    }
+    
+    if(cohesionCount > 0){
+        cohesion /= float(cohesionCount);
+        cohesion = (cohesion - position);
+        cohesion*=u_CohesionWeight;
+    }
+    
+    velocity += separation;
+    velocity += alignment;
+    velocity += cohesion;
+ //   velocity  *= u_MaxVel;
+    velocity*0.5;
+    velocity= normalize(velocity) *  clamp (length( velocity) , 0.0, 1.0); ;
+    
     
     // Update instance position
     position += velocity;
